@@ -53,54 +53,55 @@
   </div>
 
   <script>
-    const serverIP = "eggsploder2-snPD.aternos.me";
-    const port = 29251;
+  const serverAddress = "eggsploder2-snpd.aternos.me:29251";
 
-    async function checkStatus() {
-      try {
-        const response = await fetch(
-          `https://api.mcsrvstat.us/3/${serverIP}:${port}?t=${Date.now()}`,
-          { cache: "no-store" }
-        );
+  async function checkStatus() {
+    try {
+      const response = await fetch(
+        `https://api.mcsrvstat.us/3/${serverAddress}?t=${Date.now()}`,
+        { cache: "no-store" }
+      );
 
-        const data = await response.json();
+      const data = await response.json();
 
-        const statusEl = document.getElementById("status");
-        const playersEl = document.getElementById("players");
-        const versionEl = document.getElementById("version");
-        const motdEl = document.getElementById("motd");
+      console.log(data); // Debug — check browser console
 
-        if (data && data.online === true) {
-          statusEl.textContent = "ONLINE";
-          statusEl.className = "online";
+      const statusEl = document.getElementById("status");
+      const playersEl = document.getElementById("players");
+      const versionEl = document.getElementById("version");
+      const motdEl = document.getElementById("motd");
 
-          const onlinePlayers = data.players?.online ?? 0;
-          const maxPlayers = data.players?.max ?? 0;
+      if (data.online) {
+        statusEl.textContent = "ONLINE";
+        statusEl.className = "online";
 
-          playersEl.textContent = `Players: ${onlinePlayers}/${maxPlayers}`;
-          versionEl.textContent = data.version ? `Version: ${data.version}` : "";
-          motdEl.textContent = data.motd?.clean?.join(" ") ?? "";
-        } 
-        else {
-          statusEl.textContent = "OFFLINE";
-          statusEl.className = "offline";
-          playersEl.textContent = "";
-          versionEl.textContent = "";
-          motdEl.textContent = "";
-        }
+        const online = data.players?.online ?? 0;
+        const max = data.players?.max ?? 0;
 
-      } catch (error) {
-        document.getElementById("status").textContent = "OFFLINE";
-        document.getElementById("status").className = "offline";
-        document.getElementById("players").textContent = "";
-        document.getElementById("version").textContent = "";
-        document.getElementById("motd").textContent = "";
+        playersEl.textContent = `Players: ${online}/${max}`;
+        versionEl.textContent = data.version ? `Version: ${data.version}` : "";
+        motdEl.textContent = data.motd?.clean?.join(" ") ?? "";
+      } else {
+        statusEl.textContent = "OFFLINE";
+        statusEl.className = "offline";
+        playersEl.textContent = "";
+        versionEl.textContent = "";
+        motdEl.textContent = "";
       }
-    }
 
-    checkStatus();
-    setInterval(checkStatus, 15000);
-  </script>
+    } catch (error) {
+      console.error("Fetch error:", error);
+      document.getElementById("status").textContent = "OFFLINE";
+      document.getElementById("status").className = "offline";
+      document.getElementById("players").textContent = "";
+      document.getElementById("version").textContent = "";
+      document.getElementById("motd").textContent = "";
+    }
+  }
+
+  checkStatus();
+  setInterval(checkStatus, 15000);
+</script>
 
 </body>
 </html>
