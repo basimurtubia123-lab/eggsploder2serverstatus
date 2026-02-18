@@ -4,57 +4,109 @@
   <title>Aternos Server Status</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       text-align: center;
       margin-top: 100px;
       background: #111;
       color: white;
     }
+
     .online { color: #00ff88; }
     .offline { color: #ff4444; }
+
+    #container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-size: 2.5em;
+      margin: 10px 0;
+    }
+
+    p {
+      font-size: 1.2em;
+      margin: 5px 0;
+    }
   </style>
 </head>
+
 <body>
 
-  <h1>Minecraft Server Status</h1>
-  <h2 id="status">Checking...</h2>
-  <p id="players"></p>
+  <div id="container">
+    <h1>Minecraft Server Status</h1>
+    <h2 id="status">Checking...</h2>
+    <p id="players"></p>
+    <p id="version"></p>
+    <p id="motd"></p>
+  </div>
 
   <script>
-    const serverIP = "eggsploder2-snPD.aternos.me:29251"; // replace with your actual IP
-    const port = "29251"; // Java default port
+    const serverIP = "yourserver.aternos.me"; // Replace this
+    const port = "25565"; // Java default port
 
     async function checkStatus() {
       try {
         const response = await fetch(
           `https://api.mcsrvstat.us/2/${serverIP}:${port}?t=${Date.now()}`
         );
+
         const data = await response.json();
 
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
+        const versionEl = document.getElementById("version");
+        const motdEl = document.getElementById("motd");
 
-        // More accurate check
-if (data.online) {
-  statusEl.innerText = "ONLINE";
-  statusEl.className = "online";
+        if (data.online) {
+          statusEl.innerText = "ONLINE";
+          statusEl.className = "online";
 
-  if (data.players) {
-    playersEl.innerText = `Players: ${data.players.online}/${data.players.max}`;
-  } else {
-    playersEl.innerText = "Players: 0";
-  }
+          if (data.players) {
+            playersEl.innerText = `Players: ${data.players.online}/${data.players.max}`;
+          } else {
+            playersEl.innerText = "Players: 0";
+          }
 
-} else {
-  statusEl.innerText = "OFFLINE";
-  statusEl.className = "offline";
-  playersEl.innerText = "";
-}
+          versionEl.innerText = data.version ? `Version: ${data.version}` : "";
+          
+          if (data.motd && data.motd.clean) {
+            motdEl.innerText = data.motd.clean.join(" ");
+          } else {
+            motdEl.innerText = "";
+          }
 
+        } else {
+          statusEl.innerText = "OFFLINE";
+          statusEl.className = "offline";
+          playersEl.innerText = "";
+          versionEl.innerText = "";
+          motdEl.innerText = "";
+        }
 
+      } catch (error) {
+        document.getElementById("status").innerText = "OFFLINE";
+        document.getElementById("status").className = "offline";
+        document.getElementById("players").innerText = "";
+        document.getElementById("version").innerText = "";
+        document.getElementById("motd").innerText = "";
+      }
+    }
+
+    checkStatus();
+    setInterval(checkStatus, 30000);
+  </script>
 
 </body>
 </html>
-
