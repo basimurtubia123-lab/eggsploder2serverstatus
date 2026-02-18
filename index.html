@@ -37,35 +37,22 @@
         const playersEl = document.getElementById("players");
 
         // More accurate check
-<h2>Leaderboard</h2>
-<div id="leaderboard"></div>
+if (data.online) {
+  statusEl.innerText = "ONLINE";
+  statusEl.className = "online";
 
-<script>
-async function loadStats() {
-  const response = await fetch("stats.json?t=" + Date.now());
-  const data = await response.json();
+  if (data.players) {
+    playersEl.innerText = `Players: ${data.players.online}/${data.players.max}`;
+  } else {
+    playersEl.innerText = "Players: 0";
+  }
 
-  let html = "";
-
-  data.players.forEach(player => {
-    const kd = (player.kills / (player.deaths || 1)).toFixed(2);
-    const blocks = (player.walk_one_cm / 100).toFixed(0);
-
-    html += `
-      <p>
-        <strong>${player.name}</strong><br>
-        K/D: ${kd}<br>
-        Blocks Traveled: ${blocks}
-      </p>
-      <hr>
-    `;
-  });
-
-  document.getElementById("leaderboard").innerHTML = html;
+} else {
+  statusEl.innerText = "OFFLINE";
+  statusEl.className = "offline";
+  playersEl.innerText = "";
 }
 
-loadStats();
-</script>
 
 
 </body>
